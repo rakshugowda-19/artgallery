@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Art Gallery</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #d4dbdf; }
+    header { background-color: #333; color: white; padding: 20px; text-align: center; }
+    nav a { margin: 0 15px; color: white; text-decoration: none; }
+    .section { padding: 40px; }
+    .gallery img { width: 100%; max-width: 300px; margin: 10px; border-radius: 10px; }
+    .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+    .card { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center; }
+    button { padding: 10px 20px; margin-top: 10px; border: none; background-color: #333; color: white; cursor: pointer; border-radius: 5px; }
+    button:hover { background-color: #555; }
+    #cart { position: fixed; top: 20px; right: 20px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); z-index: 1000; width: 300px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Modern Art Gallery</h1>
+    <nav>
+      <a href="#promotions">Promotions</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#artists">Artists</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="promotions" class="section">
+    <h2>Current Promotions</h2>
+    <p>Enjoy up to 30% off selected artworks this month!</p>
+  </section>
+
+  <section id="gallery" class="section">
+    <h2>Artworks for Sale</h2>
+    <div class="grid gallery">
+      <div class="card">
+        <img src="C:\Users\raksh\OneDrive\Desktop\Pictures\krishna.jpg" alt="Artwork 1">
+        <h3>Abstract Dawn</h3>
+        <p>Price: $500</p>
+        <button onclick="addToCart('Abstract Dawn', 500)"> Add to Cart</button>
+      </div>
+      <div class="card">
+        <img src="C:\Users\raksh\Downloads\ocean.jpg" alt="Artwork 2">
+        <h3>Ocean Dreams</h3>
+        <p>Price: $750</p>
+        <button onclick="addToCart('Ocean Dreams', 750)"> Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="artists" class="section">
+    <h2>Featured Artists</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Prathap</h3>
+        <p>Prathap specializes in modern impressionist landscapes and has exhibited internationally.</p>
+      </div>
+      <div class="card">
+        <h3>Goyal </h3>
+        <p>Goyal's digital and surrealistic works explore themes of technology and nature.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <h2>Contact & Visit Us</h2>
+    <p>Email: contact@modernartgallery.com</p>
+    <p>Phone: +1 (123) 456-7890</p>
+    <p>Location: 123 Art Street, Creativity City, Bengaluru</p>
+  </section>
+
+  <div id="cart">
+    <h3>Shopping Cart</h3>
+    <ul id="cart-items"></ul>
+    <p>Total: $<span id="cart-total">0</span></p>
+    <div id="paypal-button-container"></div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Modern Art Gallery. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const cartItems = [];
+
+    function addToCart(name, price) {
+      cartItems.push({ name, price });
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartList = document.getElementById('cart-items');
+      const total = document.getElementById('cart-total');
+      cartList.innerHTML = '';
+      let sum = 0;
+      cartItems.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = ${item.name} - ${item.price};
+        cartList.appendChild(li);
+        sum += item.price;
+      });
+      total.textContent = sum;
+    }
+
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
+        return actions.order.create({
+          purchase_units: [{ amount: { value: totalAmount.toString() } }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert('Transaction completed by ' + details.payer.name.given_name);
+          cartItems.length = 0;
+          updateCart();
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>
